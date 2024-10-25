@@ -10,7 +10,7 @@ import { createRoomBox } from "./elements/createRoomBox";
 
 const toggleMachine = createMachine(
     {
-        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogEwCsvOCgHYAHAEY+AGhABPRGIoA2QRVXDF3AJwBmTQBZe2gL5HpaDNhwAnVKgC2AGTyxSN+zlR1kLArEo0kEAYmb1Z2LgQAWgVtHG4xESFeaTkEeKEcEV5FUW1ePRFNTQoskzN0LFw3R2dSAGswGRw6AEMYCFQAdwJ-dmDmMMCI7QoBUQlk2UQ9bViktSENHX1DMpBzSutbOwB5Lx9YEmqPfdZYHAAhFoBjOt7A-tC2IcR+HHGpKYQ9Ck0cPJyIjyBSKJV4aw2lmqAFkwAQAK4kBpNVoweF0e70RgDZ6gCLcLSCD6TVK8eJxXgLJa6AwQipQ7awhE4a5WMAtZBgJGNax4KAAC2QmKC2Ke4UQ2iEsXyikSJMQIh+FKpWhp4NM63pVUZcPhOAAVqhCNymtgAGZC6h9UU+cUIbRAnC8MTZT6pUR-eaqRaqlZ0iza+xMvWs9mck04OGcqzCx62l4IMQGHBFeJylKIHSxNTe6l+tYEVAQODsSFga0heN4xCRbhCMQppRumsKDJFdvcSVKUZ6IT+zaEYgVnF2hKKDNRbgUHB6duaTtCbv5PsastbexOFzDsUJhKaCfxZSzY+ynT1oR6fsM+x7J7wB42wbVyedxsaeX2xQCSkq5YGYyrlq652MG25VpwNYiE674TrwWQqL+apXoGIG6iybIcuWD6Vk+EH2n8MxJBOQj1k6OY+n+6rlAGwHBgaRq4iKOGMREP6CC6MFfCRegIbmvq0oBNEwmhoaYQAStsFyoBEWLMaOYh-JxqQKLwGQ5uo-HqiYQA */
+        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogEwCsvOCgHYAHAEY+AGhABPRGIoA2QRVXDF3AJwBmTQBZe2gL5HpaDNhwAnVKgC2AGTyxSN+zlR1kLArEo0kEAYmb1Z2LgQAWjFlEWEY7gpNRW09bW0KXmk5BETNHG4xXg09IV4RDV4xERMzdCxcN0dnUgBrMBkcOgBDGAhUAHcCf3Zg5jDAiL0xfO1edX4M3kSY7MRlsQL51SENHX1eWpBzButbOwB5Lx9YEiaPa9ZYHAAhboBjVpHAsdC2SfWAlEEiyskQeiSODmilEcz0Ik0mgoIkOpmO9UsTQAsmACABXEjtTo9GB4ujfeiMcb-UARbhaQTAqRghAbLZqXZaXQGI4nTHnHH4nDvKxgbrIMCEjrWPBQAAWyApQSpf3CiG0Qm0OF4ekUIjKawQIgh7J2e25qLqFkaAtxeOFovFkqJOFxEqsSt+PjVCDEBhwiMK+r0iNDmiEhs0yxwZQk3CEQkKil4ml5GJt9kF9oAVqhCFLOtgAGaK6ijFXegEIbQiLVVYrMnKifJlDnmg4mNEEVAQODsPlgcshSu0xCRXQUHDTOZCTKGcopPSG6LCANh7TcFJiWF6NPW-BEZBD6k+6qKZeJKdh7gapSZUp705NJwuY+qqvVTSGpNQ9LpPU6EI267miA5nPYVx-PAPwVhMo5RKk3BTmIM5znMFSpN+KIFIoSi7KoBiziBVpPra+JviOnBjiI2qVIa5R6GuiIVEi8Ipooj78pmdoOmKEoUXBVHVvkaQGiyCabNsZpch2oHpuBdhZjguaEAJNJCdsghFHR4lCIxajSfsPJyfu2I8SKfFgAASucLyoBElLDoJETiDgigQikG4ptU3AVIaCjlAUqQGCIoVVIoYidkYQA */
         id: "toggle",
         initial: "init",
         context: {
@@ -79,7 +79,8 @@ const toggleMachine = createMachine(
                     },
 
                     createRoomBox: {
-                        entry: ["createRoomBox", "unActiveRoomMenu", "render"],
+                        entry: ["createRoomBox", "unActiveRoomMenu", "focusNewRoomInput", "render"],
+                        exit: ["unActiveCreateRoomBox"],
                     },
                 },
 
@@ -114,12 +115,14 @@ const toggleMachine = createMachine(
                 list.key("up", () => {
                     if (machine.context.roomListCounter > 0) {
                         list.select(--machine.context.roomListCounter);
+                        console.log(machine.context.roomListCounter);
                         machine.context.screen.render();
                     }
                 });
                 list.key("down", () => {
-                    if (machine.context.roomListCounter < 5) {
+                    if (machine.context.roomListCounter < list.options.items.length) {
                         list.select(++machine.context.roomListCounter);
+
                         machine.context.screen.render();
                     }
                 });
@@ -280,8 +283,39 @@ const toggleMachine = createMachine(
                     },
                 };
                 screen.append(createRoomBox);
-                // createRoomBox.focus();
                 addExitListener(createRoomBox);
+            },
+            focusNewRoomInput: (machine) => {
+                const input = createRoomBox.children.find(
+                    (node) => node.options.name == "inputBox",
+                ) as blessed.Widgets.TextboxElement;
+
+                if (!input) throw Error(`No input element`);
+
+                input.focus();
+                input.readInput();
+
+                input.on("keypress", (ch, key) => {
+                    switch (key.name) {
+                        case "enter":
+                            const message = input.getValue();
+                            input.clearValue();
+
+                            const list = machine.context.roomListBox.children.find(
+                                (node) => node.options.name == "roomList",
+                            ) as blessed.Widgets.ListElement;
+                            if (!list) throw Error("No room list");
+
+                            list.addItem(message);
+
+                            actor.send({ type: "key.pageup" });
+                            break;
+                    }
+                });
+                addExitListener(input);
+            },
+            unActiveCreateRoomBox: (machine) => {
+                createRoomBox.destroy();
             },
             render: (machine) => machine.context.screen.render(),
         },
