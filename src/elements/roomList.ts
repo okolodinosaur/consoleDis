@@ -31,7 +31,7 @@ const list = blessed.list({
     left: 0,
     width: "100%-2",
     height: "100%-2",
-    items: ["room0", "room1", "room2", "room3"],
+    items: [],
     style: {
         selected: {
             bg: "green",

@@ -6,7 +6,7 @@ import { roomListBox } from "./elements/roomList";
 import { addExitListener } from "./systems";
 import { createRoomOptionsBox } from "./elements/roomOptions";
 import { roomMenuBox } from "./elements/roomMenu";
-import { createRoomBox } from "./elements/createRoomBox";
+import { getCreateRoomBox } from "./elements/createRoomBox";
 
 const toggleMachine = createMachine(
     {
@@ -19,6 +19,7 @@ const toggleMachine = createMachine(
             roomListCounter: 0,
             roomOptionsCounter: 0,
             selectedRoom: "",
+            createRoomBox: {} as blessed.Widgets.BoxElement,
             roomOptionsBox: {} as blessed.Widgets.BoxElement,
         },
         states: {
@@ -115,14 +116,12 @@ const toggleMachine = createMachine(
                 list.key("up", () => {
                     if (machine.context.roomListCounter > 0) {
                         list.select(--machine.context.roomListCounter);
-                        console.log(machine.context.roomListCounter);
                         machine.context.screen.render();
                     }
                 });
                 list.key("down", () => {
-                    if (machine.context.roomListCounter < list.options.items.length) {
+                    if (machine.context.roomListCounter < list.options.items.length - 1) {
                         list.select(++machine.context.roomListCounter);
-
                         machine.context.screen.render();
                     }
                 });
@@ -277,16 +276,17 @@ const toggleMachine = createMachine(
                 };
             },
             createRoomBox: (machine) => {
-                createRoomBox.style = {
+                machine.context.createRoomBox = getCreateRoomBox();
+                machine.context.createRoomBox.style = {
                     border: {
                         fg: "green",
                     },
                 };
-                screen.append(createRoomBox);
-                addExitListener(createRoomBox);
+                screen.append(machine.context.createRoomBox);
+                addExitListener(machine.context.createRoomBox);
             },
             focusNewRoomInput: (machine) => {
-                const input = createRoomBox.children.find(
+                const input = machine.context.createRoomBox.children.find(
                     (node) => node.options.name == "inputBox",
                 ) as blessed.Widgets.TextboxElement;
 
@@ -315,7 +315,7 @@ const toggleMachine = createMachine(
                 addExitListener(input);
             },
             unActiveCreateRoomBox: (machine) => {
-                createRoomBox.destroy();
+                machine.context.createRoomBox.destroy();
             },
             render: (machine) => machine.context.screen.render(),
         },
