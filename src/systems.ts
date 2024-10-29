@@ -5,3 +5,5 @@ export function addExitListener(node: blessed.Widgets.BoxElement) {
         return process.exit(0);
     });
 }
+
+export function addItemInList(list: blessed.Widgets.ListElement, item: string) {}

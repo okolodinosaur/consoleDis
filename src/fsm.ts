@@ -7,10 +7,11 @@ import { addExitListener } from "./systems";
 import { createRoomOptionsBox } from "./elements/roomOptions";
 import { roomMenuBox } from "./elements/roomMenu";
 import { getCreateRoomBox } from "./elements/createRoomBox";
+import { getErrorMessageBox } from "./elements/errorMessageBox";
 
 const toggleMachine = createMachine(
     {
-        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogEwCsvOCgHYAHAEY+AGhABPRGIoA2QRVXDF3AJwBmTQBZe2gL5HpaDNhwAnVKgC2AGTyxSN+zlR1kLArEo0kEAYmb1Z2LgQAWjFlEWEY7gpNRW09bW0KXmk5BETNHG4xXg09IV4RDV4xERMzdCxcN0dnUgBrMBkcOgBDGAhUAHcCf3Zg5jDAiL0xfO1edX4M3kSY7MRlsQL51SENHX1eWpBzButbOwB5Lx9YEiaPa9ZYHAAhboBjVpHAsdC2SfWAlEEiyskQeiSODmilEcz0Ik0mgoIkOpmO9UsTQAsmACABXEjtTo9GB4ujfeiMcb-UARbhaQTAqRghAbLZqXZaXQGI4nTHnHH4nDvKxgbrIMCEjrWPBQAAWyApQSpf3CiG0Qm0OF4ekUIjKawQIgh7J2e25qLqFkaAtxeOFovFkqJOFxEqsSt+PjVCDEBhwiMK+r0iNDmiEhs0yxwZQk3CEQkKil4ml5GJt9kF9oAVqhCFLOtgAGaK6ijFXegEIbQiLVVYrMnKifJlDnmg4mNEEVAQODsPlgcshSu0xCRXQUHDTOZCTKGcopPSG6LCANh7TcFJiWF6NPW-BEZBD6k+6qKZeJKdh7gapSZUp705NJwuY+qqvVTSGpNQ9LpPU6EI267miA5nPYVx-PAPwVhMo5RKk3BTmIM5znMFSpN+KIFIoSi7KoBiziBVpPra+JviOnBjiI2qVIa5R6GuiIVEi8Ipooj78pmdoOmKEoUXBVHVvkaQGiyCabNsZpch2oHpuBdhZjguaEAJNJCdsghFHR4lCIxajSfsPJyfu2I8SKfFgAASucLyoBElLDoJETiDgigQikG4ptU3AVIaCjlAUqQGCIoVVIoYidkYQA */
+        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogEwCsvOCgHYAHAEY+AGhABPRGIoA2QRVXDF3AJwBmTQBZe2gL5HpaDNhwAnVKgC2AGTyxSN+zlR1kLArEo0kEAYmb1Z2LgQAWjFlEWEY7gpNRW09bW0KXmk5BETNHG4xXg09IV4RDV4xERMzdCxcN0dnUgBrMBkcOgBDGAhUAHcCf3Zg5jDAiK1tHEURMsM9TKFFMSFsxCqBNVUV6f1eWpBzButbOwB5Lx9YEiaPa9ZYHAAhboBjVpHAsdC2ScQkS0BWqZQ2CG0iVmSlE2l4ehEmk0FBEh1Mx3qliaAFkwAQAK4kdqdHowfF0b70Rjjf6gCIxIQ4ETccRSWSbIoqNR7HQHI4nLHnXEEnDvKxgbrIMBEjrWPBQAAWyEpQWpf3CiAy+SEyXmWXZCBE2kZZW5Gl5Bn5mMaQrx+NF4sl0uJODxUqsKt+Pg1hpEKiEOt4QiSq2NinBml43BwZQk3ADhUUvE0VosNvswvtACtUIQZZ1sAAzZXUUZq70AiFibVJyrg0SMvhm-aW9EC9N2TMOiVSgBK5xeqA4+ddBHdnvLEzpiE00dn1XEIkXS2T4Ikiny3FSpQoBlK5VTpxxdu7ToAcmABv37CQwFYbB7Sz9J7TOPJuMpk8a9AkMlttGueg6DgmgiHoSz6NWigUGsJjogQqAQHA7DtmWIQVtOUTaPMIFiHCwb8HCFSpOC0TCCBSJIlG2gJGB3CHpYhDEGhNI+tU4YGkCFA4EBlFbsG0HwkIDEdk4LgseqlbVJo4KJjg6QKXMOhCGsegiWc9hXH88DPuhU5vlhui4fhmSGOUKR6LJcIFNBigrKoBjBmk6nHgSEkYQZkRCNGNFsjk5TRrwajcCyS7VNoigubaIpij2YDufpERAno8kSPqOQrPkOzqC2aJ1GmGmdieOaEAlr4RGkygfsUfmIAGYg4EFzYWnlGIFa59qxU6152IOERUnp5XyIyiJKOkfCaNULIpGupkxtu5RLlUqxRRmJ5dVKF5XucZU+j+jWiGIMQaH+RQAQaeFVPN4FOUJB5ttahVdneD64rAsC9PFumsZWWgjSyaxgcsqzrBdQYpVu4FJD+yQwcJcFAA */
         id: "toggle",
         initial: "init",
         context: {
@@ -82,6 +83,23 @@ const toggleMachine = createMachine(
                     createRoomBox: {
                         entry: ["createRoomBox", "unActiveRoomMenu", "focusNewRoomInput", "render"],
                         exit: ["unActiveCreateRoomBox"],
+
+                        on: {
+                            "key.enter": "createNewRoom",
+                        },
+                    },
+
+                    createNewRoom: {
+                        entry: ["createNewRoom"],
+
+                        on: {
+                            error: "errorMessage",
+                        },
+                    },
+
+                    errorMessage: {
+                        entry: ["showErrorBox", "render"],
+                        exit: ["destroyErrorBox"],
                     },
                 },
 
@@ -300,15 +318,7 @@ const toggleMachine = createMachine(
                         case "enter":
                             const message = input.getValue();
                             input.clearValue();
-
-                            const list = machine.context.roomListBox.children.find(
-                                (node) => node.options.name == "roomList",
-                            ) as blessed.Widgets.ListElement;
-                            if (!list) throw Error("No room list");
-
-                            list.addItem(message);
-
-                            actor.send({ type: "key.pageup" });
+                            actor.send({ type: "key.enter", roomName: message });
                             break;
                     }
                 });
@@ -316,6 +326,42 @@ const toggleMachine = createMachine(
             },
             unActiveCreateRoomBox: (machine) => {
                 machine.context.createRoomBox.destroy();
+            },
+            createNewRoom: async (machine) => {
+                try {
+                    const roomName = machine.event.roomName;
+                    if (!roomName) throw new Error("Room name no exist");
+
+                    const list = machine.context.roomListBox.children.find(
+                        (node) => node.options.name == "roomList",
+                    ) as blessed.Widgets.ListElement;
+                    if (!list) throw new Error("No room list");
+
+                    if (list.options.items.includes(roomName))
+                        throw new Error("This room name already exist");
+
+                    //TODO: Add logic to create new room on server
+
+                    list.addItem(roomName);
+
+                    actor.send({ type: "key.pageup" });
+                } catch (error) {
+                    actor.send({ type: "error", message: (error as Error).message });
+                }
+            },
+            showErrorBox: (machine) => {
+                const errorBox = getErrorMessageBox(machine.event.message);
+                errorBox.focus();
+                screen.append(errorBox);
+
+                errorBox.key("C-c", function () {
+                    actor.send({ type: "key.pageup" });
+                });
+            },
+            destroyErrorBox: (machine) => {
+                machine.context.screen.children
+                    .find((node) => node.options.name == "errorBox")
+                    .destroy();
             },
             render: (machine) => machine.context.screen.render(),
         },
