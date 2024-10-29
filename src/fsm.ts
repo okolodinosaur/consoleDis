@@ -7,11 +7,11 @@ import { addExitListener } from "./systems";
 import { createRoomOptionsBox } from "./elements/roomOptions";
 import { roomMenuBox } from "./elements/roomMenu";
 import { getCreateRoomBox } from "./elements/createRoomBox";
-import { getErrorMessageBox } from "./elements/errorMessageBox";
+import { getErrorMessageBox, getQuestionBox } from "./elements/messagesBox";
 
 const toggleMachine = createMachine(
     {
-        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogEwCsvOCgHYAHAEY+AGhABPRGIoA2QRVXDF3AJwBmTQBZe2gL5HpaDNhwAnVKgC2AGTyxSN+zlR1kLArEo0kEAYmb1Z2LgQAWjFlEWEY7gpNRW09bW0KXmk5BETNHG4xXg09IV4RDV4xERMzdCxcN0dnUgBrMBkcOgBDGAhUAHcCf3Zg5jDAiK1tHEURMsM9TKFFMSFsxCqBNVUV6f1eWpBzButbOwB5Lx9YEiaPa9ZYHAAhboBjVpHAsdC2ScQkS0BWqZQ2CG0iVmSlE2l4ehEmk0FBEh1Mx3qliaAFkwAQAK4kdqdHowfF0b70Rjjf6gCIxIQ4ETccRSWSbIoqNR7HQHI4nLHnXEEnDvKxgbrIMBEjrWPBQAAWyEpQWpf3CiAy+SEyXmWXZCBE2kZZW5Gl5Bn5mMaQrx+NF4sl0uJODxUqsKt+Pg1hpEKiEOt4QiSq2NinBml43BwZQk3ADhUUvE0VosNvswvtACtUIQZZ1sAAzZXUUZq70AiFibVJyrg0SMvhm-aW9EC9N2TMOiVSgBK5xeqA4+ddBHdnvLEzpiE00dn1XEIkXS2T4Ikiny3FSpQoBlK5VTpxxdu7ToAcmABv37CQwFYbB7Sz9J7TOPJuMpk8a9AkMlttGueg6DgmgiHoSz6NWigUGsJjogQqAQHA7DtmWIQVtOUTaPMIFiHCwb8HCFSpOC0TCCBSJIlG2gJGB3CHpYhDEGhNI+tU4YGkCFA4EBlFbsG0HwkIDEdk4LgseqlbVJo4KJjg6QKXMOhCGsegiWc9hXH88DPuhU5vlhui4fhmSGOUKR6LJcIFNBigrKoBjBmk6nHgSEkYQZkRCNGNFsjk5TRrwajcCyS7VNoigubaIpij2YDufpERAno8kSPqOQrPkOzqC2aJ1GmGmdieOaEAlr4RGkygfsUfmIAGYg4EFzYWnlGIFa59qxU6152IOERUnp5XyIyiJKOkfCaNULIpGupkxtu5RLlUqxRRmJ5dVKF5XucZU+j+jWiGIMQaH+RQAQaeFVPN4FOUJB5ttahVdneD64rAsC9PFumsZWWgjSyaxgcsqzrBdQYpVu4FJD+yQwcJcFAA */
+        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogGwCMALDgCsvId34UATEIAcAdhkBOXgBoQAT0QBaOYpyiAzPwOSZ-GVKFC5AXxtq0GbDgBOqVAFsAMnlik3njiodMgsBLCUNEggDEyhrOxcCAYmODJCivy8BgLcinKS3NxqmgiShcKSRkaKYjLc6QZ2DuhYuAHevqQA1mDqOHQAhjAQqADuBJHsscwJ0UkKvDi1ObxyBnIU3BRWJYiSipI4WUUG9YflFLzNII5tru4eAPIhYbAkHUGvrLA4AEKDADG3Sm0Rm8TY80QKSO6Uy2Vy+UKxQ00PKxzk3CEB2Mh0UFH4Nzuzg6Lwh70+wXJOAASmAPKgAG5gUH0RizSGgJJaKrCRYFbgGQUiPh7BD8bE4Iy8KoEraiImtEmPACyYAIAFcSL1+kMYBq6KyYuyIYlEItlkJVutNttdqiylllrwilbarwKBRlJJFU52qr1RqcICXGBBsgwNq+q48FAABbII3gsJmhDZSSCOS8eqSCgGT0HAxiq2CE5Y-EbSQFa72W5K-2eNWa4Oh8ORnU4dURlxJk0pqFpkyZ7PcXP5qSKIsOofLRRz-jl-hVGRNWvEhseJtBgBWqEIUf62AAZonqNM+3MuYhsgY9ASinPsbfpDIxeYDM7yxYpLxROlffcHRbi2YYRjSjx-KgHAHp2BDdr2cT9leaaYjIlqFkuWLZNwchijOc7zouy6ri0foPI2gYgW2AByYBjOBngkGALhuD2Z5ghenKcPsMoUDgFByAoMhmMJmK1HhGaznOZhyFkkgepkAEkvSTJgAxHgAIoanAEIfI8dIMsyCEcqmWhGDgo5CAS2HYSKYoFEcEqyVI1RyEISntCpzLqVpOlhHpngGapZC8FEbKIZe3FlIo3BSvi4hiPmS7pPw9nok5EhVMYblXB5rheWpjzkOx4UmQOfCCCIYgnMo+RZPZZwWbouYelIKXcHYtYEKgEBwOw67nhFXHcjFUrZYcIiYlsEpijyLo4Fmuj8FNwmTsteWEMQg1lch2ZLJOvCZCkGQbFZU6lFoMp6PJS2iDaOxLnlHQ+H422mgOQhLvoWaHGYOyYmsYryYIBExXkz4VrYa71uRzzfOEb1IVFWjmPo5gLgYIh5q6r4OtIH4Svw+Q4SI9RWCRdZkUBgaI5FSSTkc2yHG5MhrPIv5ioKxwET9XqFm5T0Bs2IagWAtPDYgigWBZfMs2zWaqNOv4WRm+QK3t4iCxRza7oQ4upgIVjCAuWbLTIVYCLjpQSnoRNznwjRSOshLQ1TQtBiLbbqZBSSle9u3LbFWbpCKmOyeUQNE1Jc5VLaD1Q6RgHu1REa0fRjz6wO2bKMIo6FEYol5EIeFSPxnp5qzC5IkUWubpRzGsWqsCwMMYscUNqblNmMvKFaslubIKKlFWQjR4Jv4ay7ifKYZhWeL5fhI8mdPaKjrkTWs2ziDNDpWkcUjiAcuYCSuCeU4BBXqZnu18SfXruiuJiY4rpQrkcsiTnky38HJ7mdUAA */
         id: "toggle",
         initial: "init",
         context: {
@@ -52,6 +52,8 @@ const toggleMachine = createMachine(
                     "room.options.Back": {
                         target: "roomList",
                     },
+
+                    "room.options.Remove": "removeRoomQuestion",
                 },
                 exit: ["unActiveRoomOptionBox"],
             },
@@ -108,6 +110,30 @@ const toggleMachine = createMachine(
                         target: "roomList",
                         reenter: true,
                     },
+                },
+            },
+
+            removeRoomQuestion: {
+                entry: ["showRemoveRoomBox", "render"],
+
+                on: {
+                    roomRemove: [
+                        {
+                            target: "removeRoom",
+                            guard: "isRoomRemove",
+                        },
+                        {
+                            target: "roomList",
+                            reenter: true,
+                        },
+                    ],
+                },
+            },
+
+            removeRoom: {
+                always: {
+                    target: "roomList",
+                    reenter: true,
                 },
             },
         },
@@ -174,6 +200,7 @@ const toggleMachine = createMachine(
                 list.removeAllListeners();
                 list.free();
             },
+            // Room options box
             createRoomOptionBox: (machine) => {
                 const roomOptionsBox = createRoomOptionsBox(machine.context.roomListCounter);
                 machine.context.roomOptionsBox = roomOptionsBox;
@@ -216,6 +243,14 @@ const toggleMachine = createMachine(
                 machine.context.roomOptionsBox.destroy();
                 machine.context.roomOptionsCounter = 0;
             },
+            showRemoveRoomBox: (machine) => {
+                const question = getQuestionBox();
+                question.ask(`Remove ${machine.context.selectedRoom} room?`, (err, value) => {
+                    actor.send({ type: "roomRemove", remove: value == "true" ? true : false });
+                });
+                screen.append(question);
+            },
+            // Room menu
             focusOnRoomMenu: (machine) => {
                 roomMenuBox.style = {
                     border: {
@@ -293,6 +328,7 @@ const toggleMachine = createMachine(
                     },
                 };
             },
+            // Create room menu
             createRoomBox: (machine) => {
                 machine.context.createRoomBox = getCreateRoomBox();
                 machine.context.createRoomBox.style = {
@@ -343,12 +379,12 @@ const toggleMachine = createMachine(
                     //TODO: Add logic to create new room on server
 
                     list.addItem(roomName);
-
                     actor.send({ type: "key.pageup" });
                 } catch (error) {
                     actor.send({ type: "error", message: (error as Error).message });
                 }
             },
+            // Error box
             showErrorBox: (machine) => {
                 const errorBox = getErrorMessageBox(machine.event.message);
                 errorBox.focus();
@@ -364,6 +400,11 @@ const toggleMachine = createMachine(
                     .destroy();
             },
             render: (machine) => machine.context.screen.render(),
+        },
+        guards: {
+            isRoomRemove: (machine) => {
+                return machine.event.remove;
+            },
         },
     },
 );
