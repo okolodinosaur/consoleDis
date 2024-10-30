@@ -1,4 +1,4 @@
-import { assign, createActor, createMachine } from "xstate";
+import { assign, createActor, createMachine, matchesState } from "xstate";
 import * as blessed from "blessed";
 
 import { screen } from "./elements/screen";
@@ -11,7 +11,7 @@ import { getErrorMessageBox, getQuestionBox } from "./elements/messagesBox";
 
 const toggleMachine = createMachine(
     {
-        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogGwCMALDgCsvId34UATEIAcAdhkBOXgBoQAT0QBaOYpyiAzPwOSZ-GVKFC5AXxtq0GbDgBOqVAFsAMnlik3njiodMgsBLCUNEggDEyhrOxcCAYmODJCivy8BgLcinKS3NxqmgiShcKSRkaKYjLc6QZ2DuhYuAHevqQA1mDqOHQAhjAQqADuBJHsscwJ0UkKvDi1ObxyBnIU3BRWJYiSipI4WUUG9YflFLzNII5tru4eAPIhYbAkHUGvrLA4AEKDADG3Sm0Rm8TY80QKSO6Uy2Vy+UKxQ00PKxzk3CEB2Mh0UFH4Nzuzg6Lwh70+wXJOAASmAPKgAG5gUH0RizSGgJJaKrCRYFbgGQUiPh7BD8bE4Iy8KoEraiImtEmPACyYAIAFcSL1+kMYBq6KyYuyIYlEItlkJVutNttdqiylllrwilbarwKBRlJJFU52qr1RqcICXGBBsgwNq+q48FAABbII3gsJmhDZSSCOS8eqSCgGT0HAxiq2CE5Y-EbSQFa72W5K-2eNWa4Oh8ORnU4dURlxJk0pqFpkyZ7PcXP5qSKIsOofLRRz-jl-hVGRNWvEhseJtBgBWqEIUf62AAZonqNM+3MuYhsgY9ASinPsbfpDIxeYDM7yxYpLxROlffcHRbi2YYRjSjx-KgHAHp2BDdr2cT9leaaYjIlqFkuWLZNwchijOc7zouy6ri0foPI2gYgW2AByYBjOBngkGALhuD2Z5ghenKcPsMoUDgFByAoMhmMJmK1HhGaznOZhyFkkgepkAEkvSTJgAxHgAIoanAEIfI8dIMsyCEcqmWhGDgo5CAS2HYSKYoFEcEqyVI1RyEISntCpzLqVpOlhHpngGapZC8FEbKIZe3FlIo3BSvi4hiPmS7pPw9nok5EhVMYblXB5rheWpjzkOx4UmQOfCCCIYgnMo+RZPZZwWbouYelIKXcHYtYEKgEBwOw67nhFXHcjFUrZYcIiYlsEpijyLo4Fmuj8FNwmTsteWEMQg1lch2ZLJOvCZCkGQbFZU6lFoMp6PJS2iDaOxLnlHQ+H422mgOQhLvoWaHGYOyYmsYryYIBExXkz4VrYa71uRzzfOEb1IVFWjmPo5gLgYIh5q6r4OtIH4Svw+Q4SI9RWCRdZkUBgaI5FSSTkc2yHG5MhrPIv5ioKxwET9XqFm5T0Bs2IagWAtPDYgigWBZfMs2zWaqNOv4WRm+QK3t4iCxRza7oQ4upgIVjCAuWbLTIVYCLjpQSnoRNznwjRSOshLQ1TQtBiLbbqZBSSle9u3LbFWbpCKmOyeUQNE1Jc5VLaD1Q6RgHu1REa0fRjz6wO2bKMIo6FEYol5EIeFSPxnp5qzC5IkUWubpRzGsWqsCwMMYscUNqblNmMvKFaslubIKKlFWQjR4Jv4ay7ifKYZhWeL5fhI8mdPaKjrkTWs2ziDNDpWkcUjiAcuYCSuCeU4BBXqZnu18SfXruiuJiY4rpQrkcsiTnky38HJ7mdUAA */
+        /** @xstate-layout N4IgpgJg5mDOIC5QBcD2UoBswDoCWAdnsgMQDaADALqKgAOqsxeqBtIAHogGwCMALDgCsvIdwCcAZl4Ux3fgBoQAT0SSAHDlnjx3AOwih63UMkBfM0rQZsOAE6pUAWwAyeWKQfOcqOshYEsJQ0SCAMTP6s7FwIkpIATDjqQuL8vNL8Enrx3NxKqgjxOcLxkvxl4mLq3MnmliDWWLheru6kANZgyjh0AIYwEKgA7gTB7OHMUaExeuq8OJXSvHqSehTcskL5iPHiiWm5GhJF8RS8FlboTfaOTgDyfgGwJC0+j6ywOABCvQDG7WNQhNImxpmoEkkUmkMlkcnkVGoijh+HpuEJduU9uIKPwLg0rrYWg8Qc9Xr4STgAEpgJyoABuYEB9EYk1BoBiAFpSsJZsscpJuJIRHxtgh+OicGVeKUcetRHjGoTbgBZMAEACuJE63T6MHVdCZYRZIOiiF5C1MvGWq3Wm1F8TSC14uVMlRkFHE0oVBOaKrV6pwvzsYF6yDAWq69jwUAAFshDcCAqaEOkHTg9LxqqdJBQKLtJKLTIIDmjsat4tlzvVFb7nKqNYHg6Hw9qcGqw3YE8ak2CUwlBBmsxQc3mpKL+wsdKlS-xSuo6pcbLWnPWAwArVCECPdbAAM3j1HG3am7MQ6Uk4i0mQklVKeyMov486dpfUufiVqMQm9S5udf9jYhmGlK3F8qAcNubYEB2XYRD2p4pqimi3lIs5ouk+jjmmU7TlCc4Lviv4tKugHNgAcmAQwgc4JBgHYDidoeQLHmynA7NKFBaHoszqOoT7qKilRYYIOF8XoaQfh6uLVj69g0vSYDUU4ACK6pwCCLy3NStIMrBrLJhygrprOH7QtxLrqKK2T7EI4l5mUqxCGcP7XMGOmKbcqnqQEmnONpClkLwITMnBJ5sbEjqlAYVrJLkDrJFZSLinZpTlAYzkyUR8kMkp5BMSF+m9nFyKnPFejiNZY4Igg2SSBaKyovEySerMFj1AQqAQHA7A1keoWsZyVrzOJRQCOk5lopZ1VctKODyB6tnDnx6xGC5tiEMQfWFQhQimFoog1A5RjnqKHLSkIOACAtqwVBsBE1n+rQeFtJq9kIs6XRmezLbZfB6PaAiTjouRSFiw56Gty7Ek8L3weFHJPpdT6ZEKMgCpN9p7eK-AVfoIjVLt92ycR-qw2FMRSIkGx7AYcyzBmvCikZOM6Oo8S7akAqZJDj0kUGQFgGTA2IOIb5zR6FbHfTVrjlac0OhVDOZs60mLq5foNhuhBC8mAi7cImQZiibNG1NBTipeLO6Jmph5isquEer-4NvzzZKWBMQFa9CECKi6Y28KQojfE9o40DOhRba70Q5lTsrgBrthhRVG3DrvaZp6wjcEUgr8YJWzVTmiS5rmGgCLCuQ8yTDZ0QxqqwLA-SC8x-XJqNmjU6Iqwort1T2gY4fcUNczyFX2Uec4XkeHDibk4gCOaA55Xs8sGzyOKhYQnm8i7KcFCzKsY-uUpacIQjF1zOzTX48kOL-dV851Rs1Qq2UHoCW1ZhAA */
         id: "toggle",
         initial: "init",
         context: {
@@ -131,6 +131,7 @@ const toggleMachine = createMachine(
             },
 
             removeRoom: {
+                entry: ["removeSelectedRoom"],
                 always: {
                     target: "roomList",
                     reenter: true,
@@ -249,6 +250,16 @@ const toggleMachine = createMachine(
                     actor.send({ type: "roomRemove", remove: value == "true" ? true : false });
                 });
                 screen.append(question);
+            },
+            removeSelectedRoom: (machine) => {
+                const roomName = machine.context.selectedRoom;
+
+                // Send event on server about this
+
+                const list = machine.context.roomListBox.children.find(
+                    (node) => node.options.name == "roomList",
+                ) as blessed.Widgets.ListElement;
+                list.options.items = list.options.items.filter((room) => room != roomName);
             },
             // Room menu
             focusOnRoomMenu: (machine) => {
@@ -399,6 +410,7 @@ const toggleMachine = createMachine(
                     .find((node) => node.options.name == "errorBox")
                     .destroy();
             },
+            // Screen
             render: (machine) => machine.context.screen.render(),
         },
         guards: {
