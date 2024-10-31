@@ -146,6 +146,8 @@ const toggleMachine = createMachine(
                 machine.context.screen.append(roomMenuBox);
             },
             focusOnRoomList: (machine) => {
+                machine.context.selectedRoom = "";
+                machine.context.roomListCounter = 0;
                 machine.context.roomListBox.style = {
                     border: {
                         fg: "green",
@@ -155,6 +157,7 @@ const toggleMachine = createMachine(
                     (node) => node.options.name == "roomList",
                 ) as blessed.Widgets.ListElement;
                 if (!list) throw Error("No room list");
+                list.select(0);
 
                 list.focus();
 
@@ -247,7 +250,7 @@ const toggleMachine = createMachine(
             showRemoveRoomBox: (machine) => {
                 const question = getQuestionBox();
                 question.ask(`Remove ${machine.context.selectedRoom} room?`, (err, value) => {
-                    actor.send({ type: "roomRemove", remove: value == "true" ? true : false });
+                    actor.send({ type: "roomRemove", remove: value });
                 });
                 screen.append(question);
             },
@@ -259,7 +262,7 @@ const toggleMachine = createMachine(
                 const list = machine.context.roomListBox.children.find(
                     (node) => node.options.name == "roomList",
                 ) as blessed.Widgets.ListElement;
-                list.options.items = list.options.items.filter((room) => room != roomName);
+                list.removeItem(roomName);
             },
             // Room menu
             focusOnRoomMenu: (machine) => {
